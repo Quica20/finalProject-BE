@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import ProductManagerClass from '../classes/ProductManagerClass.js';
-/* import __dirname from '../utils.js';
-import path from 'path'; */
+import handlebars from 'express-handlebars'
+import __dirname from '../utils.js';
+import path from 'path'
 
 const router = Router();
+
+router.engine('handlebars', handlebars.engine());
+router.set('views', __dirname + '/src/views');
+router.set('view engine', 'handlebars');
+
 const managerProducts = new ProductManagerClass();
 
 router.get('/', (req, res) => {
@@ -11,7 +17,10 @@ router.get('/', (req, res) => {
     const products = managerProducts.getProducts();
     //Si no se ingreso nada mostrar todos los productos:
     if (!quantityOfProducts) {
-        return res.send(products)
+        return res.render('products', {
+            product: products
+        }
+        )
     } else {
         quantityOfProducts = parseInt(quantityOfProducts) //Convertimos lo solicitado a numero entero
         let requestedProducts = products.slice(0, quantityOfProducts)
