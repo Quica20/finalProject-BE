@@ -1,14 +1,7 @@
 import { Router } from 'express';
 import ProductManagerClass from '../classes/ProductManagerClass.js';
-import handlebars from 'express-handlebars'
-import __dirname from '../utils.js';
-import path from 'path'
 
 const router = Router();
-
-router.engine('handlebars', handlebars.engine());
-router.set('views', __dirname + '/src/views');
-router.set('view engine', 'handlebars');
 
 const managerProducts = new ProductManagerClass();
 
@@ -18,9 +11,8 @@ router.get('/', (req, res) => {
     //Si no se ingreso nada mostrar todos los productos:
     if (!quantityOfProducts) {
         return res.render('products', {
-            product: products
-        }
-        )
+            products
+        })
     } else {
         quantityOfProducts = parseInt(quantityOfProducts) //Convertimos lo solicitado a numero entero
         let requestedProducts = products.slice(0, quantityOfProducts)
@@ -29,10 +21,10 @@ router.get('/', (req, res) => {
 
 })
 
-router.get('/:productId', (req, res) => {
-    const productId = req.params.productId;
+router.get('/:pid', (req, res) => {
+    const pid = req.params.pid;
     //Buscamos el producto por id
-    const product = managerProducts.getProductById(productId)
+    const product = managerProducts.getProductById(pid)
 
     if (!product) {
         return res.send({ error: "No hay ningun producto con ese Id" })
@@ -48,19 +40,19 @@ router.post('/', async (req, res) => {
     res.send({ status: 'success' });
 })
 
-router.put('/:productId', (req, res) => {
-    const idProduct = req.params.productId;
+router.put('/:pid', (req, res) => {
+    const pid = req.params.pid;
     const updateBodyProduct = req.body;
 
-    managerProducts.updateProduct(idProduct, updateBodyProduct);
+    managerProducts.updateProduct(pid, updateBodyProduct);
     res.send({ status: 'success' })
 })
 
-router.delete('/:idProduct', (req, res) => {
-    const idProduct = req.params.idProduct;
+router.delete('/:pid', (req, res) => {
+    const pid = req.params.pid;
 
-    managerProducts.deleteProduct(idProduct);
+    managerProducts.deleteProduct(pid);
     res.send({ status: 'success' })
 })
 
-export default router
+export default router;

@@ -2,7 +2,7 @@
 import fs from 'fs';
 import { v4 as uuidV4 } from 'uuid';
 
-const directoryPath = "src/classes/files";
+const directoryPath = "./src/classes/files";
 const path = `${directoryPath}/products.json`;
 
 class ProductManagerClass {
@@ -29,64 +29,81 @@ class ProductManagerClass {
         }
     }
 
-    addProduct({ title, description, price, thumbnail, code, stock }) {
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
-            console.error('Todos los campos son requeridos');
-            return;
+    addProduct({ title, description, price, thumbnails, code, stock }) {
+        try {
+            if (!title || !description || !price || !thumbnails || !code || !stock) {
+                throw new Error('Todos los campos son requeridos')
+            };
+
+            if (this._products.some((product) => product.code === code)) {
+                throw new Error('Ya existe un producto con el mismo código')
+            };
+
+            const product = {
+                id: uuidV4(),
+                title,
+                description,
+                price,
+                thumbnails,
+                code,
+                stock,
+            };
+
+            this._products.push(product);
+            this.save();
+            console.log('se ha agregado un nuevo Producto')
+
+        } catch (error) {
+            console.error('Error al agregar el producto', error.message)
         }
-
-        if (this._products.some((product) => product.code === code)) {
-            console.error('Ya existe un producto con el mismo código');
-            return;
-        }
-
-        const product = {
-            id: uuidV4(),
-            title,
-            description,
-            price,
-            thumbnail,
-            code,
-            stock,
-        };
-
-        this._products.push(product);
-        this.save();
-        console.log('se ha agregado un nuevo Producto')
-    }
+    };
 
     getProducts() {
         return this._products;
     }
 
     getProductById(id) {
-        const product = this._products.find((product) => product.id === id);
-        if (product) {
-            return product;
-        } else {
-            console.error(`No exise el producto con el siguiente id:${id}`);
+        try {
+            const product = this._products.find((product) => product.id === id); //Preguntar como manejar este error
+            if (!product) {
+                throw new Error(`No exise el producto con el siguiente id:${id}`);
+            } else {
+                return product
+            }
+        } catch (error) {
+            console.error('Error al buscar el producto:', error.message)
         }
-    }
-    //el metodo .findIndex busca el indice indicado
-    updateProduct(id, updateFields) {
-        const productIndex = this._products.findIndex((product) => product.id === id);
-        if (productIndex === -1) {
-            console.error(`No exise el producto con el siguiente id:${id}`);
-            return;
-        }
-        this._products[productIndex] = { ...this._products[productIndex], ...updateFields };
-        this.save();
     }
 
-    deleteProduct(id) {
-        const productIndex = this._products.findIndex((product) => product.id === id);
-        if (productIndex === -1) {
-            console.error(`No exise el producto con el siguiente id:${id}`);
-            return;
+    //el metodo .findIndex busca el indice indicado
+    updateProduct(id, updateFields) {
+        try {
+            const productIndex = this._products.findIndex((product) => product.id === id);
+            if (productIndex === -1) {
+                throw new Error(`No exise el producto con el siguiente id:${id}`);
+                return;
+            }
+            this._products[productIndex] = { ...this._products[productIndex], ...updateFields };
+            this.save();
+
+        } catch (error) {
+            console.error('Error al actualizar producto', error.message)
         }
-        this._products.splice(productIndex, 1);
-        this.save();
+    };
+
+    deleteProduct(id) {
+        try {
+            const productIndex = this._products.findIndex((product) => product.id === id);
+            if (productIndex === -1) {
+                throw new Error(`No exise el producto con el siguiente id:${id}`);
+                return;
+            }
+            this._products.splice(productIndex, 1);
+            this.save();
+        } catch (error) {
+            console.error('Error al eliminar producto', error.message)
+        }
     }
-}
+};
 
 export default ProductManagerClass

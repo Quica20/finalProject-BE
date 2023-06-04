@@ -34,7 +34,6 @@ class CartsManager {
 
     addProductToCart = async (idCart, idProduct) => {
         const cart = await this.consultCartById(idCart);
-
         const index = cart.products.findIndex((product) => {
             return product.id == idProduct
         })
@@ -49,9 +48,7 @@ class CartsManager {
         const cartIndex = carts.findeIndex((cartIterador) => {
             return cartIterador.id == cart.id
         })
-
         carts[cartIndex] = cart
-
         return await fs.promises.writeFile(path, JSON.stringify(carts, null, '\t'))
     };
 }
